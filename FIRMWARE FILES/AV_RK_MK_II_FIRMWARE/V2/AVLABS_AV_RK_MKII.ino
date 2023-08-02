@@ -41,6 +41,7 @@ AVLABS_AV_RK_MKII.ino, the firmware of the AV-RK MK II keyboard.
 #define KEY_CHEVRON_L 236
 #define KEY_CHEVRON_R 236
 #define KEY_SCREENSHOT 0xFA
+#define KEY_FUN 0xF4
 
 //---------------------------------------------
 
@@ -62,7 +63,13 @@ char keyMapNUMPAD[numKeys] = {
   KEY_LEFT_ARROW,   KEY_DOWN_ARROW,  KEY_RIGHT_ARROW,  KEY_KP_0,     KEY_KP_0,      KEY_KP_ENTER,    KEY_KP_DOT,             KEY_F13
 };
 
-char keyMapNUMPADALT[numKeys] = {0};
+char keyMapNUMPADALT[numKeys] = {
+  KEY_PRINT_SCREEN, KEY_SCROLL_LOCK, KEY_PAUSE,        KEY_NUM_LOCK, KEY_KP_SLASH, KEY_KP_ASTERISK,  KEY_KP_MINUS,           KEY_F13, 
+  KEY_INSERT,       KEY_HOME,        KEY_PAGE_UP,      KEY_KP_7,     KEY_KP_8,      KEY_KP_9,        KEY_KP_PLUS,            KEY_F13,
+  KEY_DELETE,       KEY_END,         KEY_PAGE_DOWN,    KEY_KP_4,     KEY_KP_5,      KEY_KP_6,        KEY_KP_PLUS,            KEY_F13,
+  KEY_F13,          KEY_UP_ARROW,    KEY_F13,          KEY_KP_1,     KEY_KP_2,      KEY_KP_3,        KEY_KP_ENTER,           KEY_F13,
+  KEY_LEFT_ARROW,   KEY_DOWN_ARROW,  KEY_RIGHT_ARROW,  KEY_KP_0,     KEY_KP_0,      KEY_KP_ENTER,    KEY_KP_DOT,             KEY_F13
+  }; 
 
 char keyMapLEFT[numKeys] = {
   KEY_ESC,           '1',            '2',              '3',          '4',           '5',             '6',                    KEY_F13,
@@ -75,7 +82,7 @@ char keyMapLEFT[numKeys] = {
 char keyMapLEFTALT[numKeys] = {
   KEY_ESC,           KEY_F1,            KEY_F2,              KEY_F3,          KEY_F4,           KEY_F5,             KEY_F6,                    KEY_F13,
   KEY_TAB,           'q',            'w',              'e',          'r',           't',             '`'/*KEY_SUPERSCRIPT_TWO*/,    KEY_F13, 
-  KEY_CAPS_LOCK,     'a',            's',              'd',          'f',           'g',              MOUSE_SCROLL_UP/*'CLIC GAUCHE'*/,          KEY_F13, 
+  KEY_CAPS_LOCK,     'a',            's',              'd',          KEY_FUN,           'g',              MOUSE_SCROLL_UP/*'CLIC GAUCHE'*/,          KEY_F13, 
   KEY_LEFT_SHIFT,    KEY_F13/*'chevron'*/,      'z',              'x',          'c',           'v',             MOUSE_SCROLL_DOWN/*'CLIC DROIT'*/,           KEY_F13, 
   KEY_LEFT_CTRL,      KEY_LEFT_GUI,  KEY_LEFT_ALT,   KEY_F13/* FONCTION*/,     KEY_F13/*SCREENSHOT*/,    ' ',             KEY_RETURN,           KEY_F13
 };
@@ -97,16 +104,22 @@ char keyMapRIGHTALT[numKeys] = {
   KEY_RETURN,             ' ',          KEY_RIGHT_ALT,           KEY_F13,       KEY_F13,          KEY_F13,          '\\',                    KEY_F13
 };
 
+//TODO SUR LA KEYMAP:
+//le win shift s 
+
 bool keyStateNP[numKeys] = {0};
 bool keyStateL[numKeys] = {0};
 bool keyStateR[numKeys] = {0};   
 
 bool isShiftPressed = false;
 bool isCapsLockOn = false;
+bool initialDelayPassed = false;
+bool funTypingModeActive = false;
 
 unsigned long lastPressTime;
+unsigned long lastToggleTime = 0;
+
 uint8_t lastKeyPressed = 255; 
-bool initialDelayPassed = false;
 
 uint8_t mouseSpeed =7; 
 int16_t x = 0;
@@ -114,7 +127,12 @@ int16_t y = 0;
 //---------------------------------------------
 
 
-//------------------FUNCTIONS------------------.................;;;;;....;;;;...........................
+//------------------PROTOTYPES------------------
+void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keyState, bool funcKeyPressed);
+//---------------------------------------------
+
+
+//------------------FUNCTIONS------------------
 /**
  * @brief void setup(), init function
 */
@@ -193,6 +211,10 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
     if (isPressed != keyState[i]) {
       keyState[i] = isPressed;
       switch (key) {
+        case KEY_FUN: 
+          funTypingModeActive = !funTypingModeActive; 
+        break;
+
         case KEY_SCREENSHOT:
           if (isPressed) {
             Keyboard.press(KEY_LEFT_GUI);
@@ -205,7 +227,6 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
             initialDelayPassed = false;
           }
           break;
-
         case KEY_CHEVRON_L:
           if (isPressed) {
             if (isCapsLockOn || isShiftPressed) {
@@ -248,6 +269,14 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
     }
   }
 
+  if (funTypingModeActive) {
+    if (millis() - lastToggleTime > 150) { 
+      Keyboard.press(KEY_CAPS_LOCK);
+      Keyboard.release(KEY_CAPS_LOCK);
+      lastToggleTime = millis(); ff
+    }
+  }
+
   if (lastKeyPressed != 255 && keyState[lastKeyPressed] &&
       ((millis() - lastPressTime > INITIAL_DELAY && !initialDelayPassed) ||
        (initialDelayPassed && millis() - lastPressTime > REPEAT_DELAY))) {
@@ -261,6 +290,7 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
   }
 }
 //---------------------------------------------
+f
 
 
 //END
