@@ -4,10 +4,8 @@
 The AV-RK MK II is the second iteration of the AVlabs [AV-RK MK I](https://github.com/avmolaei/AV-RK-MK1), the AVlabs "Redox Styled" Mechanical Keyboard.
 ![AV-RK MK 2](https://cdn.discordapp.com/attachments/712626945023672370/1136623967264841788/AIL4fc9oPaMrQqEiUUiGKn0ue0uNpUhGLoGsiR-ZmI_d5t5b0r-WU9mKvzKnxqKiSDBv4QqQe6PU4JJ2Dw_a2II3Jc0MFzd7t7LpJvK8gHM_HqEeRpo8sYJr8nUEON0nudLFA9ZImRuV4uGQCOJoATzPSOXi-XK1oesAKJHStjPJx3bQYySWk12tcDynvKp1PMNYCd9F60jtGz6HKBTEuKBHFVDk4kavRRu6fdKhR9pD-q-R3UaUe1H3ncpsaCa1un5cZM9sOIzfdGT3MLhEUuaACSy6r7AydZTw6WUz7JtQbsCUUH_GpoL0vpJ3rCO9X-LHH0OKBgaURwBRLzTAXV98hEdmCB4hvSDWZXqyDh6CsKkhXyblXJgYSAZq5bXlc7DBoRJhMecXbj4pm4Bw5IcPtljWLdVJFkS2hfKcVseFt8_U39f1mhcxcx-c6K5qF9WZb-K61eZ1gLWFcFCENuaB8ampULj8I7xjkRYaMOPv-GraYxztZSJJpF-_..png)
 
-<p>
-  <img src="https://cdn.discordapp.com/attachments/712626945023672370/1136636241874522173/VID_20230802_211052-_1_.gif" />
-</p>
 
+![enter image description here](img/gif1.gif)
 
 
 
@@ -20,7 +18,7 @@ The AV-RK MK II uses a 3D printed body, Kailh Choc Switches and is based on a XI
 The [AV-RK-MK I](https://github.com/avmolaei/AV-RK-MK1) and the [AV-KO1](https://github.com/avmolaei/AV-KO1/) are both handwired keyboards (Expaination in details in the AV-KO1 repo). While handwire is easy to get started on, it has a few problems:
 
  - The switches are held to the top plate with nothing but friction, and over time (especially if you use "tall" switch+keycap combos, the switch can get loose, or if you knock the board it can get the switch to "pop out":
- - ![enter image description here](https://cdn.discordapp.com/attachments/712626945023672370/1136627387820413049/VID_20230803_132005.gif)
+ - ![enter image description here](/img/gif2.gif)
  - If you don't plan out your tolerances and screw holes correctly, the top plate will "bow", and make a gap between the plate and body as there is nothing to keep it from bowig
  - Soldering 100 switches and diodes is a good exercise but it is a bit tedious...
  - As most shift registers/IO Expanders are small SMD parts, most "sane" Handwire builds have multiple microcontrôleurs, which is not always ideal. 
