@@ -208,7 +208,7 @@ void pressKey(PCA9505_06 &expander, uint8_t pin, uint8_t key, uint8_t delay);
 /**
  * void setup(), init function
 */
-void setup() {
+void setup() {/*******************************************************************************************************************************/*
   NUMPAD.begin(0x23);           //0x23
   //LEFT.begin(ADDR_LEFT);      //0x22
   //RIGHT.begin(ADDR_RIGHT);    //0x21

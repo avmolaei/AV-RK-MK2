@@ -44,32 +44,35 @@ FIRMWARE: the arudino code that runs the keyboard
 
 PCB files: gerbers and boms
 
-
+MODULES: modules, duh.
 
   
 
   
 `//TODO: shit to fix and/or add
 `
-`
+
 PCBs: on all PCBs, the I2C/PWR lines are too close to the edge
-`
-`pogo pins need to be laid out symetricaly (male on left, and female on right) to allow for modules)
-`
-`
-FIRMWARE: needs to be ported from SAMD21 core to NRF52840. Also, need to fix trackball precision issue
-`
-`
-CAD: maybe enhance aesthetics for the top plate?
-`
 
 
+
+FIRMWARE: needs to be ported from SAMD21 core to NRF52840. Also, need to fix trackball precision issue. Also, the USB HID lib needs to go from Keyboard.h to TinyUSB.
+
+
+CAD: maybe enhance aesthetics for the top plate? also need to make some sort of alignement system for the pogo pins, sometimes when docking/undocking modules the pins may short and require a MCU reset
 
 
 `MODULES:`
-`
-AV-RK SENSOR MODULE: It has a thin OLED display and a square one. It will have an RTC, a humidity/temp sensor and a heartbeat sensor, all that on the I2C BUS
-`
-`
-AV-RK MOUSE CHARGER: it will have a tiny arduino nano inside, and will recieve commands based on keyboard shortcuts on the I2C bus. The "independant" arduino will trigger LEDs for caps lock/num lock/scroll lock, and will control a tiny servo-actuated arm that shows pogo pins to charge the mouse overnight. The mouse needs to be modified with a USB connector soldered to pogo pins. `
+
+**__AV-RK SENSOR MODULE__**: It has a thin OLED display and a square one. It will have an RTC, a humidity/temp sensor and a heartbeat sensor, all that on the I2C BUS. V2 of this module will inclue an independant MCU so the code is not cluttering the main keyboard code. AAAAAAAAA
+
+
+**__AV-RK MOUSE CHARGER__**: it will have a tiny arduino nano inside, and will recieve commands based on keyboard shortcuts on the I2C bus. The "independant" arduino will trigger LEDs for caps lock/num lock/scroll lock, and will control a tiny servo-actuated arm that shows pogo pins to charge the mouse overnight. The mouse needs to be modified with a USB connector soldered to pogo pins. 
+
+Sensors have been designed, made; all is left is to integrate them in the main code. 
+
+A better, more sensible solution would be to embedd a small low power MCU (e.g: arduino nano) in each module, and make them use a "protocol", where Fn + [NUMPAD NUMBER] sends a set command and the module is programmed to understand the command, instead of integrating everything in the main keyboard code, making a messs. 
+
+ 
+
 

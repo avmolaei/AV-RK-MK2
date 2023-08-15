@@ -41,7 +41,7 @@ void setup() {
   }
 
   if (!rtc.isrunning()) {
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+   // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     Serial.println("RTC is NOT running!");
   }
 

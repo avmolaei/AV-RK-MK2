@@ -230,6 +230,8 @@ void setup() {
    // Serial.println(F("SSD1306 allocation failed"));
     for(;;);
   }
+  
+  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   */
 }
 
