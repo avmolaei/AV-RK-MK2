@@ -52,7 +52,7 @@ MODULES: modules, duh.
 `//TODO: shit to fix and/or add
 `
 
-PCBs: on all PCBs, the I2C/PWR lines are too close to the edge
+PCBs: on all PCBs, the I2C/PWR lines are too close to the edge. On the right PCB, the pins for the pimoroni trackball are reversed, which requires an annoying bodge.
 
 
 
