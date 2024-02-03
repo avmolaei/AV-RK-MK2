@@ -54,7 +54,7 @@ MODULES: modules, duh.
 
 PCBs: on all PCBs, the I2C/PWR lines are too close to the edge. On the right PCB, the pins for the pimoroni trackball are reversed, which requires an annoying bodge.
 
-
+Technically speaking, I2C is not rated for hot swap. In a future iteration, the PCBs **SHOULD** integrate a TCA4307 from TI, a simple I2C buffer to allow for a less buggy kb if the stack is moved from arduino to TinyUSB/from scratch
 
 FIRMWARE: needs to be ported from SAMD21 core to NRF52840. Also, need to fix trackball precision issue. Also, the USB HID lib needs to go from Keyboard.h to TinyUSB.
 
