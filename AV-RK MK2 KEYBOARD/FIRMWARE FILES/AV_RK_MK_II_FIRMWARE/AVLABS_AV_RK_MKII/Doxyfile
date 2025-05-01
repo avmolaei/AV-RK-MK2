@@ -1,0 +1,15 @@
+
+PROJECT_NAME           = "FW_SAMD21_AV_RK_MKII"
+OUTPUT_DIRECTORY       = "docs"
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+RECURSIVE              = NO
+EXTRACT_ALL            = YES
+FILE_PATTERNS          = *.cpp
+INPUT                  = AVLABS_AV_RK_MKII.cpp
+
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DOT_IMAGE_FORMAT       = svg
+GENERATE_TREEVIEW      = YES

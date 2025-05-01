@@ -16,6 +16,8 @@ AVLABS_AV_RK_MKII.ino, the firmware of the AV-RK MK II keyboard.
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -------------------------------------------------------------------------*/
 
+//THIS IS THE NO TRACKBALL, NO MODULE VERSION.
+
 
 //------------------LIBRARIES------------------
 //PCA9505_9506.h: Lib for the NXP PCA9505 IO Expander through I2C
@@ -24,23 +26,11 @@ AVLABS_AV_RK_MKII.ino, the firmware of the AV-RK MK II keyboard.
 #include <PCA9505_9506.h>
 #include <Keyboard.h>
 #include <Wire.h>
-#include <pimoroniTrackball.h>
-
-#include "Adafruit_SHTC3.h"
 #include "Mouse.h"
 //---------------------------------------------
 
 
 //------------------DEFINES-------------------
-//module addresses
-#define NANO_I2C_ADDRESS 8
-#define SCREEN_ADDRESS 0x3C 
-
-// OLED screen module
-#define SCREEN_WIDTH 128 
-#define SCREEN_HEIGHT 64 
-#define OLED_RESET     -1 
-
 //delays for the key actuation
 #define INITIAL_DELAY 250
 #define REPEAT_DELAY 25
@@ -72,13 +62,6 @@ PCA9505_06 LEFT;
 PCA9505_06 RIGHT;
 //---------------------------------------------
 
-//------------------I2C OBJECTS----------------
-TwoWire &ServoControllerBus = Wire;
-//---------------------------------------------
-
-//------------------MODULE OBJECTS-------------
-
-//---------------------------------------------
 
 //--------------------VARS---------------------
 const uint8_t numKeys = 40; 
@@ -185,14 +168,7 @@ void setup() {
   }
 
   Keyboard.begin();
-/*
-  if (trackball.isConnected()) {
-    Mouse.begin();
-  } else {
-    while (true) {
-      delay(1000);
-    }
-  }*/
+
 }
 
 
@@ -205,25 +181,7 @@ void loop() {
   checkKeys(NUMPAD, keyMapNUMPAD, keyMapNUMPADALT, keyStateNP, funcKeyPressed);
   checkKeys(LEFT, keyMapLEFT, keyMapLEFTALT, keyStateL, funcKeyPressed);
   checkKeys(RIGHT, keyMapRIGHT, keyMapRIGHTALT, keyStateR, funcKeyPressed);
- // trackball.setRGBW(0, 0, 0, 255);
 
- /*
-  if (trackball.changed()) {
-    y = (trackball.right() - trackball.left()) * mouseSpeed;
-    x = (trackball.down() - trackball.up()) * (-1) * mouseSpeed;
-    if (x != 0 || y != 0) {
-      Mouse.move(x, y, 0);
-    }
-    if (trackball.click()) {
-      Mouse.press(MOUSE_LEFT);
-      // trackball.setRGBW(0, 0, 255, 255);
-    } else if (trackball.release()) {
-      if (Mouse.isPressed(MOUSE_LEFT)) {
-        Mouse.release(MOUSE_LEFT);
-        //   trackball.setRGBW(0, 0, 255, 0);
-      }
-    }
-  }*/
 }
 
 
@@ -243,13 +201,108 @@ void loop() {
  * @note MOUSE_LEFT_CLICK and MOUSE_RIGHT_CLICK are special constants used to represent mouse click actions.
  */
 void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keyState, bool funcKeyPressed) {
+  void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keyState, bool funcKeyPressed) {
   for (uint8_t i = 0; i < numKeys; i++) {
     unsigned long currentPressTime = millis();
     bool isPressed = (expander.digitalRead(i) == 0);
     char key = funcKeyPressed ? funcKeyMap[i] : keyMap[i];
     if (isPressed != keyState[i]) {
       keyState[i] = isPressed;
+      switch (key) {
+        case KEY_FUN:
+          funTypingModeActive = !funTypingModeActive;
+          break;
+        case KEY_SCREENSHOT:
+          if (isPressed) {
+            Keyboard.press(KEY_LEFT_GUI);
+            Keyboard.press(KEY_LEFT_SHIFT);
+            Keyboard.press('s');
+            delay(50);
+            Keyboard.releaseAll();
+            lastPressTime = millis();
+            lastKeyPressed = i;
+            initialDelayPassed = false;
+          }
+          break;
+        case KEY_CHEVRON_L:
+          if (isPressed) {
+            if (isCapsLockOn || isShiftPressed) {
+              Keyboard.press(KEY_LEFT_SHIFT);
+              Keyboard.press(KEY_CHEVRON_L);
+              Keyboard.releaseAll();
+            } else {
+              Keyboard.press(KEY_CHEVRON_R);
+              Keyboard.release(KEY_CHEVRON_R);
+            }
+            lastPressTime = millis();
+            lastKeyPressed = i;
+            initialDelayPassed = false;
+          }
+          break;
+        case MOUSE_LEFT_CLICK:
+          isPressed ? Mouse.press(MOUSE_LEFT) : Mouse.release(MOUSE_LEFT);
+          // trackball.setRGBW(0, 255, 0, 255);
+          break;
+        case MOUSE_RIGHT_CLICK:
+          isPressed ? Mouse.press(MOUSE_RIGHT) : Mouse.release(MOUSE_RIGHT);
 
+          break;
+        case MOUSE_SCROLL_UP:
+          if (isPressed) Mouse.move(0, 0, 1);
+          break;
+        case MOUSE_SCROLL_DOWN:
+          if (isPressed) Mouse.move(0, 0, -1);
+          break;
+
+        case KEY_MOD_1:   
+          if (currentPressTime - lastPressTimeMod1 > DEBOUNCE_DELAY) {
+            countServoMod1++;
+            lastPressTimeMod1 = currentPressTime;
+
+            if(countServoMod1 % 2) {
+              //DEPLOY ARM
+              chargingArmDeploy(true);
+            } else {
+              //RETRACT ARM
+              chargingArmDeploy(false);
+            }
+          }
+          break;
+        case KEY_MOD_2:
+          if (currentPressTime - lastPressTimeMod2 > DEBOUNCE_DELAY) {
+            keyMod2Counter++;
+            lastPressTimeMod2 = currentPressTime;
+            switch(keyMod2Counter) {
+              case 1:
+                trackball.setRGBW(255, 0, 0, 0);
+                break;
+              case 2:
+                trackball.setRGBW(0, 255, 0, 0);
+                break;
+              case 3:
+                trackball.setRGBW(0, 0, 255, 0);
+                break;
+              default:
+                trackball.setRGBW(0, 0, 0, 255);
+                keyMod2Counter = 0;
+                break;
+              }
+            } 
+          break;
+        case KEY_MOD_3:
+          break;
+        case KEY_MOD_4: 
+          //trackball.setRGBW(255, 0, 0, 0);
+          break;
+        case KEY_MOD_5: 
+          //trackball.setRGBW(0, 255, 255, 0);
+          break;
+        case KEY_MOD_6: 
+          trackball.setRGBW(0, 0, 0, 255);
+          break;
+
+
+        default:
           if (isPressed) {
             Keyboard.press(key);
             lastPressTime = millis();
@@ -259,18 +312,16 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
             Keyboard.release(key);
             if (i == lastKeyPressed) lastKeyPressed = 255;
           }
-    
+          break;
       }
     }
-  
+  }
 
-  if (lastKeyPressed != 255 && keyState[lastKeyPressed] && ((millis() - lastPressTime > INITIAL_DELAY && !initialDelayPassed) || (initialDelayPassed && millis() - lastPressTime > REPEAT_DELAY))) {
-    char key = funcKeyPressed ? funcKeyMap[lastKeyPressed] : keyMap[lastKeyPressed];
-    if (key != MOUSE_LEFT_CLICK && key != MOUSE_RIGHT_CLICK && key != MOUSE_SCROLL_UP && key != MOUSE_SCROLL_DOWN) {
-      Keyboard.release(key);
-      Keyboard.press(key);
-      lastPressTime = millis();
-      initialDelayPassed = true;
+  if (funTypingModeActive) {
+    if (millis() - lastToggleTime > 150) {
+      Keyboard.press(KEY_CAPS_LOCK);
+      Keyboard.release(KEY_CAPS_LOCK);
+      lastToggleTime = millis();
     }
   }
 }

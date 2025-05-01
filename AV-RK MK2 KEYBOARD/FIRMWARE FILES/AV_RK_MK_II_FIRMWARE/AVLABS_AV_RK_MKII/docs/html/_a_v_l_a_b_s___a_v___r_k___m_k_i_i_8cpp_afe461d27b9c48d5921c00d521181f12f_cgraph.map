@@ -1,0 +1,9 @@
+<map id="loop" name="loop">
+<area shape="rect" id="Node000001" title="void loop(), infinite loop function" alt="" coords="5,31,51,57"/>
+<area shape="rect" id="Node000002" href="$_a_v_l_a_b_s___a_v___r_k___m_k_i_i_8cpp.html#a456c92bd38c33b10ce243b3057a7d27e" title="Checks the state of each key connected to a specific PCA9505 chip, triggers key press/release actions..." alt="" coords="132,5,218,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="51,38,116,26,117,31,52,43"/>
+<area shape="rect" id="Node000004" href="$_a_v_l_a_b_s___a_v___r_k___m_k_i_i_8cpp.html#aeddd51544efa381ba6186ab15b78a85b" title="Processes trackball motion and sends smooth, accelerated mouse movements." alt="" coords="99,56,251,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="52,45,84,51,83,56,51,50"/>
+<area shape="rect" id="Node000003" href="$_a_v_l_a_b_s___a_v___r_k___m_k_i_i_8cpp.html#af6f73b1733da4c9f4e7916779f21aa0e" title="changingArmDeploy(), Moves a servo motor to deploy or retract a charging arm." alt="" coords="299,5,434,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="219,16,283,16,283,21,219,21"/>
+</map>
