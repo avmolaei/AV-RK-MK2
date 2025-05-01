@@ -145,6 +145,7 @@ const long interval = 1000;
 //------------------PROTOTYPES------------------
 void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keyState, bool funcKeyPressed);
 void chargingArmDeploy(bool servoCommand);
+void updateTrackball();
 //---------------------------------------------
 
 
@@ -188,23 +189,8 @@ void loop() {
   checkKeys(NUMPAD, keyMapNUMPAD, keyMapNUMPADALT, keyStateNP, funcKeyPressed);
   checkKeys(LEFT, keyMapLEFT, keyMapLEFTALT, keyStateL, funcKeyPressed);
   checkKeys(RIGHT, keyMapRIGHT, keyMapRIGHTALT, keyStateR, funcKeyPressed);
- // trackball.setRGBW(0, 0, 0, 255);
-  if (trackball.changed()) {
-    y = (trackball.right() - trackball.left()) * mouseSpeed;
-    x = (trackball.down() - trackball.up()) * (-1) * mouseSpeed;
-    if (x != 0 || y != 0) {
-      Mouse.move(x, y, 0);
-    }
-    if (trackball.click()) {
-      Mouse.press(MOUSE_LEFT);
-      // trackball.setRGBW(0, 0, 255, 255);
-    } else if (trackball.release()) {
-      if (Mouse.isPressed(MOUSE_LEFT)) {
-        Mouse.release(MOUSE_LEFT);
-        //   trackball.setRGBW(0, 0, 255, 0);
-      }
-    }
-  }
+  trackball.setRGBW(0, 0, 0, 255);
+  updateTrackballMotion();
 }
 
 
@@ -337,7 +323,7 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
           break;
       }
     }
-  }f
+  }
 
   if (funTypingModeActive) {
     if (millis() - lastToggleTime > 150) {
@@ -361,6 +347,7 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
   }*/
 }
 //---------------------------------------------
+
 
 /**
  * @brief changingArmDeploy(), Moves a servo motor to deploy or retract a charging arm.
@@ -388,5 +375,79 @@ void chargingArmDeploy(bool servoCommand){
     trackball.setRGBW(0, 255, 0, 0); 
   }
 }
+
+
+/**
+ * @brief Processes trackball motion and sends smooth, accelerated mouse movements.
+ * 
+ * This function reads directional input from the Pimoroni Trackball module and calculates
+ * movement deltas for both X and Y axes. It applies:
+ * - directional smoothing,
+ * - deadzone filtering, and
+ * - dynamic acceleration,
+ * to provide responsive and stable mouse control behavior.
+ * 
+ * @note Replaces the basic binary movement with proportional, real-time cursor motion.
+ * @note Uses persistent smoothing variables to maintain motion continuity.
+ */
+ void updateTrackballMotion() {
+  /*//trivial handling, not recommended.
+    if (trackball.changed()) {
+    y = (trackball.right() - trackball.left()) * mouseSpeed;
+    x = (trackball.down() - trackball.up()) * (-1) * mouseSpeed;
+    if (x != 0 || y != 0) {
+      Mouse.move(x, y, 0);
+    }
+    if (trackball.click()) {
+      Mouse.press(MOUSE_LEFT);
+      // trackball.setRGBW(0, 0, 255, 255);
+    } else if (trackball.release()) {
+      if (Mouse.isPressed(MOUSE_LEFT)) {
+        Mouse.release(MOUSE_LEFT);
+        //   trackball.setRGBW(0, 0, 255, 0);
+      }
+    }
+  }*/
+  if (!trackball.changed()) return;
+
+  // Read basic direction deltas
+  int deltaY = trackball.right() - trackball.left();
+  int deltaX = (trackball.down() - trackball.up()) * -1; // inverted X cause my ball be mounted backwards
+
+  // Calculate combined movement magnitude
+  int magnitude = abs(deltaX) + abs(deltaY);
+
+  // Apply acceleration curve
+  float speedFactor = 1.0 + 2 * magnitude;  // Tunable: gain of 0.99
+  if (speedFactor > 5.0) speedFactor = 5.0;
+
+  // Apply exponential smoothing to motion
+  static float smoothX = 0;
+  static float smoothY = 0;
+  const float smoothFactor = 0.02;  // 0.0 = sharp, 1.0 = sluggish
+  //TODO: render these values editable on the fly
+
+  // Apply simple exponential smoothing to blend new input with previous motion
+  // This reduces jitter and creates fluid, natural cursor movement
+  smoothX = (1.0 - smoothFactor) * (deltaX * speedFactor) + smoothFactor * smoothX;
+  smoothY = (1.0 - smoothFactor) * (deltaY * speedFactor) + smoothFactor * smoothY;
+
+  // Apply a deadzone to eliminate jitter when idle
+  if (abs(smoothX) > 0.3 || abs(smoothY) > 0.3) {
+    Mouse.move((int)smoothX, (int)smoothY, 0);
+  }
+
+  // Optional: handle click/release with built-in LED feedback
+  if (trackball.click()) {
+    trackball.setRGBW(0, 0, 255, 0);
+    Mouse.press(MOUSE_LEFT);
+  } else if (trackball.release()) {
+    if (Mouse.isPressed(MOUSE_LEFT)) {
+     trackball.setRGBW(255, 255, 255, 0);
+      Mouse.release(MOUSE_LEFT);
+    }
+  }
+}
+
 
 //END
