@@ -135,6 +135,7 @@ int16_t x = 0;
 int16_t y = 0;
 
 uint8_t countServoMod1 = 0;
+bool armDeployed = false;
 int keyMod2Counter = 0;
 unsigned long lastPressTimeMod1 = 0;
 unsigned long lastPressTimeMod2 = 0;
@@ -213,7 +214,8 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
   for (uint8_t i = 0; i < numKeys; i++) {
     unsigned long currentPressTime = millis();
     bool isPressed = (expander.digitalRead(i) == 0);
-    char key = funcKeyPressed ? funcKeyMap[i] : keyMap[i];
+    uint8_t key = (uint8_t)(funcKeyPressed ? funcKeyMap[i] : keyMap[i]);
+
     if (isPressed != keyState[i]) {
       keyState[i] = isPressed;
       switch (key) {
@@ -262,40 +264,18 @@ void checkKeys(PCA9505_06& expander, char* keyMap, char* funcKeyMap, bool* keySt
           if (isPressed) Mouse.move(0, 0, -1);
           break;
 
-        case KEY_MOD_1:   
-          if (currentPressTime - lastPressTimeMod1 > DEBOUNCE_DELAY) {
-            countServoMod1++;
+        case KEY_MOD_1:
+          if (isPressed && (currentPressTime - lastPressTimeMod1 > DEBOUNCE_DELAY)) {
             lastPressTimeMod1 = currentPressTime;
-
-            if(countServoMod1 % 2) {
-              //DEPLOY ARM
-              chargingArmDeploy(true);
-            } else {
-              //RETRACT ARM
-              chargingArmDeploy(false);
-            }
+            armDeployed = !armDeployed;          // toggle
+            chargingArmDeploy(armDeployed);      
           }
+          
           break;
+
+
         case KEY_MOD_2:
-          if (currentPressTime - lastPressTimeMod2 > DEBOUNCE_DELAY) {
-            keyMod2Counter++;
-            lastPressTimeMod2 = currentPressTime;
-            switch(keyMod2Counter) {
-              case 1:
-                trackball.setRGBW(255, 0, 0, 0);
-                break;
-              case 2:
-                trackball.setRGBW(0, 255, 0, 0);
-                break;
-              case 3:
-                trackball.setRGBW(0, 0, 255, 0);
-                break;
-              default:
-                trackball.setRGBW(0, 0, 0, 255);
-                keyMod2Counter = 0;
-                break;
-              }
-            } 
+    
           break;
         case KEY_MOD_3:
           break;
