@@ -36,8 +36,8 @@ AVLABS_AV_RK_MKII_ArmModule.ino, I2C slave firmware for the charging arm.
 #define STATUS_LED_PIN          LED_BUILTIN
 
 //Servo and motion config
-#define ANGLE_MIN               0       // degrees
-#define ANGLE_MAX               180     // degrees
+#define ANGLE_MIN               3       // degrees
+#define ANGLE_MAX               250     // degrees
 
 //Set true for eased movement; false for immediate set
 #define USE_SMOOTH_MOTION       false
